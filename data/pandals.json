@@ -1,3 +1,24 @@
 {
-  "pandals": []
+  "pandals": [
+    {
+      "id": 1,
+      "name": "Test Pandal",
+      "area": "South Kolkata",
+      "zone": "South",
+      "category": "Traditional",
+      "description": "A sample pandal entry for testing the PANDale explorer.",
+      "latitude": 22.5000,
+      "longitude": 88.3500
+    },
+    {
+      "id": 2,
+      "name": "Test Pandal 2",
+      "area": "North Kolkata",
+      "zone": "North",
+      "category": "Theme",
+      "description": "Another sample entry for testing search and filtering.",
+      "latitude": 22.6000,
+      "longitude": 88.3700
+    }
+  ]
 }
