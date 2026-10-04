@@ -1,1 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>Pandals | PANDale Kolkata</title>
+
+    <meta
+        name="description"
+        content="Explore Durga Puja pandals across Kolkata with PANDale."
+    >
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+    <header>
+        <nav class="navbar">
+            <div class="container nav-inner">
+
+                <a href="index.html" class="logo">
+                    PANDale
+                </a>
+
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="pandals.html" class="active">Pandals</a>
+                    <a href="metro.html">Metro</a>
+                    <a href="circuits.html">Circuits</a>
+                    <a href="about.html">About</a>
+                </div>
+
+            </div>
+        </nav>
+    </header>
+
+
+    <!-- PAGE HEADER -->
+    <main>
+
+        <section class="section">
+            <div class="container">
+
+                <h1>Explore Kolkata's Pandals</h1>
+
+                <p>
+                    Discover Durga Puja pandals across Kolkata.
+                </p>
+
+
+                <!-- SEARCH -->
+                <div class="pandal-search">
+
+                    <input
+                        type="text"
+                        id="pandalSearch"
+                        placeholder="Search pandal or area..."
+                    >
+
+                </div>
+
+
+                <!-- FILTER -->
+                <div class="pandal-filter">
+
+                    <button
+                        class="filter-btn active"
+                        data-zone="all">
+                        All
+                    </button>
+
+                    <button
+                        class="filter-btn"
+                        data-zone="North">
+                        North
+                    </button>
+
+                    <button
+                        class="filter-btn"
+                        data-zone="South">
+                        South
+                    </button>
+
+                </div>
+
+
+                <!-- PANDAL CARDS -->
+                <div
+                    id="pandalGrid"
+                    class="pandal-grid">
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- JAVASCRIPT -->
+    <script>
+
+        let allPandals = [];
+        let selectedZone = "all";
+
+
+        // Load Pandal Data
+        async function loadPandals() {
+
+            try {
+
+                const response = await fetch("data/pandals.json");
+
+                const data = await response.json();
+
+                allPandals = data.pandals;
+
+                displayPandals();
+
+            } catch (error) {
+
+                console.error("Unable to load pandal data:", error);
+
+                document.getElementById("pandalGrid").innerHTML =
+                    "<p>Unable to load pandal data.</p>";
+
+            }
+
+        }
+
+
+        // Display Pandals
+        function displayPandals() {
+
+            const grid =
+                document.getElementById("pandalGrid");
+
+            const searchText =
+                document
+                    .getElementById("pandalSearch")
+                    .value
+                    .toLowerCase();
+
+
+            const filteredPandals =
+                allPandals.filter(function(pandal) {
+
+                    const matchesSearch =
+                        pandal.name
+                            .toLowerCase()
+                            .includes(searchText) ||
+
+                        pandal.area
+                            .toLowerCase()
+                            .includes(searchText);
+
+
+                    const matchesZone =
+                        selectedZone === "all" ||
+                        pandal.zone === selectedZone;
+
+
+                    return matchesSearch && matchesZone;
+
+                });
+
+
+            grid.innerHTML = "";
+
+
+            if (filteredPandals.length === 0) {
+
+                grid.innerHTML =
+                    "<p>No pandals found.</p>";
+
+                return;
+
+            }
+
+
+            filteredPandals.forEach(function(pandal) {
+
+                const card =
+                    document.createElement("div");
+
+                card.className = "pandal-card";
+
+
+                card.innerHTML = `
+
+                    <div class="pandal-card-content">
+
+                        <span class="pandal-category">
+                            ${pandal.category}
+                        </span>
+
+                        <h2>
+                            ${pandal.name}
+                        </h2>
+
+                        <p class="pandal-area">
+                            📍 ${pandal.area}
+                        </p>
+
+                        <p>
+                            ${pandal.description}
+                        </p>
+
+                    </div>
+
+                `;
+
+
+                grid.appendChild(card);
+
+            });
+
+        }
+
+
+        // Search
+        document
+            .getElementById("pandalSearch")
+            .addEventListener(
+                "input",
+                displayPandals
+            );
+
+
+        // Zone Filters
+        document
+            .querySelectorAll(".filter-btn")
+            .forEach(function(button) {
+
+                button.addEventListener(
+                    "click",
+                    function() {
+
+                        document
+                            .querySelectorAll(".filter-btn")
+                            .forEach(function(btn) {
+                                btn.classList.remove("active");
+                            });
+
+
+                        this.classList.add("active");
+
+
+                        selectedZone =
+                            this.dataset.zone;
+
+
+                        displayPandals();
+
+                    }
+                );
+
+            });
+
+
+        // Start
+        loadPandals();
+
+    </script>
+
+</body>
+</html>
