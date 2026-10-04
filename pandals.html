@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Pandals | PANDale Kolkata</title>
 
@@ -11,259 +16,526 @@
         content="Explore Durga Puja pandals across Kolkata with PANDale."
     >
 
-    <link rel="stylesheet" href="css/style.css">
+    <link
+        rel="stylesheet"
+        href="./css/style.css"
+    >
 </head>
+
 
 <body>
 
-    <!-- NAVIGATION -->
+    <!-- =========================================
+         NAVIGATION
+    ========================================== -->
+
     <header>
         <nav class="navbar">
+
             <div class="container nav-inner">
 
-                <a href="index.html" class="logo">
+                <a
+                    href="./index.html"
+                    class="logo"
+                >
                     PANDale
                 </a>
 
+
                 <div class="nav-links">
-                    <a href="index.html">Home</a>
-                    <a href="pandals.html" class="active">Pandals</a>
-                    <a href="metro.html">Metro</a>
-                    <a href="circuits.html">Circuits</a>
-                    <a href="about.html">About</a>
+
+                    <a href="./index.html">
+                        Home
+                    </a>
+
+                    <a
+                        href="./pandals.html"
+                        class="active"
+                    >
+                        Pandals
+                    </a>
+
+                    <a href="./metro.html">
+                        Metro
+                    </a>
+
+                    <a href="./circuits.html">
+                        Circuits
+                    </a>
+
+                    <a href="./about.html">
+                        About
+                    </a>
+
                 </div>
 
             </div>
+
         </nav>
     </header>
 
 
-    <!-- PAGE HEADER -->
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
     <main>
 
         <section class="section">
+
             <div class="container">
 
-                <h1>Explore Kolkata's Pandals</h1>
+
+                <!-- PAGE TITLE -->
+
+                <h1>
+                    Explore Kolkata's Pandals
+                </h1>
+
 
                 <p>
                     Discover Durga Puja pandals across Kolkata.
                 </p>
 
 
-                <!-- SEARCH -->
+
+                <!-- =================================
+                     SEARCH
+                ================================== -->
+
                 <div class="pandal-search">
 
                     <input
                         type="text"
                         id="pandalSearch"
                         placeholder="Search pandal or area..."
+                        autocomplete="off"
                     >
 
                 </div>
 
 
-                <!-- FILTER -->
+
+                <!-- =================================
+                     FILTERS
+                ================================== -->
+
                 <div class="pandal-filter">
 
                     <button
+                        type="button"
                         class="filter-btn active"
-                        data-zone="all">
+                        data-zone="all"
+                    >
                         All
                     </button>
 
+
                     <button
+                        type="button"
                         class="filter-btn"
-                        data-zone="North">
+                        data-zone="North"
+                    >
                         North
                     </button>
 
+
                     <button
+                        type="button"
                         class="filter-btn"
-                        data-zone="South">
+                        data-zone="South"
+                    >
                         South
                     </button>
 
                 </div>
 
 
-                <!-- PANDAL CARDS -->
-                <div
-                    id="pandalGrid"
-                    class="pandal-grid">
+
+                <!-- =================================
+                     STATUS
+                ================================== -->
+
+                <div id="pandalStatus">
+
+                    <p>
+                        Loading pandals...
+                    </p>
+
                 </div>
 
+
+
+                <!-- =================================
+                     PANDAL GRID
+                ================================== -->
+
+                <div
+                    id="pandalGrid"
+                    class="pandal-grid"
+                >
+                </div>
+
+
             </div>
+
         </section>
 
     </main>
 
 
-    <!-- JAVASCRIPT -->
+
+    <!-- =========================================
+         PANDAL JAVASCRIPT
+    ========================================== -->
+
     <script>
 
+        /* -----------------------------------------
+           GLOBAL VARIABLES
+        ------------------------------------------ */
+
         let allPandals = [];
+
         let selectedZone = "all";
 
 
-        // Load Pandal Data
+
+        /* -----------------------------------------
+           LOAD PANDALS FROM JSON
+        ------------------------------------------ */
+
         async function loadPandals() {
+
+            const status =
+                document.getElementById("pandalStatus");
+
+            const grid =
+                document.getElementById("pandalGrid");
+
 
             try {
 
-                const response = await fetch("data/pandals.json");
+                const response =
+                    await fetch("./data/pandals.json");
 
-                const data = await response.json();
 
-                allPandals = data.pandals;
+                /* Check if JSON file exists */
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "JSON file could not be loaded. HTTP status: "
+                        + response.status
+                    );
+
+                }
+
+
+                /* Convert response into JSON */
+
+                const data =
+                    await response.json();
+
+
+                /* Check JSON structure */
+
+                if (
+                    !data ||
+                    !Array.isArray(data.pandals)
+                ) {
+
+                    throw new Error(
+                        "Invalid JSON structure. Expected a 'pandals' array."
+                    );
+
+                }
+
+
+                /* Store data */
+
+                allPandals =
+                    data.pandals;
+
+
+                /* Update status */
+
+                status.innerHTML =
+                    "<p>" +
+                    allPandals.length +
+                    " pandals loaded.</p>";
+
+
+                /* Display pandals */
 
                 displayPandals();
 
+
             } catch (error) {
 
-                console.error("Unable to load pandal data:", error);
+                console.error(
+                    "PANDale Error:",
+                    error
+                );
 
-                document.getElementById("pandalGrid").innerHTML =
-                    "<p>Unable to load pandal data.</p>";
+
+                status.innerHTML = `
+                    <div class="empty-state">
+
+                        <h2>
+                            Unable to Load Pandals
+                        </h2>
+
+                        <p>
+                            There was a problem loading the
+                            pandal data.
+                        </p>
+
+                    </div>
+                `;
+
+
+                grid.innerHTML = "";
 
             }
 
         }
 
 
-        // Display Pandals
+
+        /* -----------------------------------------
+           DISPLAY PANDALS
+        ------------------------------------------ */
+
         function displayPandals() {
 
             const grid =
                 document.getElementById("pandalGrid");
 
+
+            const searchInput =
+                document.getElementById("pandalSearch");
+
+
             const searchText =
-                document
-                    .getElementById("pandalSearch")
-                    .value
+                searchInput.value
+                    .trim()
                     .toLowerCase();
 
+
+            /* Filter data */
 
             const filteredPandals =
                 allPandals.filter(function(pandal) {
 
+
+                    /* Search match */
+
+                    const name =
+                        String(
+                            pandal.name || ""
+                        ).toLowerCase();
+
+
+                    const area =
+                        String(
+                            pandal.area || ""
+                        ).toLowerCase();
+
+
                     const matchesSearch =
-                        pandal.name
-                            .toLowerCase()
-                            .includes(searchText) ||
+                        name.includes(searchText) ||
+                        area.includes(searchText);
 
-                        pandal.area
-                            .toLowerCase()
-                            .includes(searchText);
 
+                    /* Zone match */
 
                     const matchesZone =
                         selectedZone === "all" ||
                         pandal.zone === selectedZone;
 
 
-                    return matchesSearch && matchesZone;
+                    return (
+                        matchesSearch &&
+                        matchesZone
+                    );
 
                 });
 
 
+            /* Clear previous cards */
+
             grid.innerHTML = "";
 
 
-            if (filteredPandals.length === 0) {
+            /* No results */
 
-                grid.innerHTML =
-                    "<p>No pandals found.</p>";
+            if (
+                filteredPandals.length === 0
+            ) {
+
+                grid.innerHTML = `
+                    <div class="empty-state">
+
+                        <h2>
+                            No Pandals Found
+                        </h2>
+
+                        <p>
+                            Try another search or filter.
+                        </p>
+
+                    </div>
+                `;
 
                 return;
 
             }
 
 
-            filteredPandals.forEach(function(pandal) {
 
-                const card =
-                    document.createElement("div");
+            /* Create cards */
 
-                card.className = "pandal-card";
-
-
-                card.innerHTML = `
-
-                    <div class="pandal-card-content">
-
-                        <span class="pandal-category">
-                            ${pandal.category}
-                        </span>
-
-                        <h2>
-                            ${pandal.name}
-                        </h2>
-
-                        <p class="pandal-area">
-                            📍 ${pandal.area}
-                        </p>
-
-                        <p>
-                            ${pandal.description}
-                        </p>
-
-                    </div>
-
-                `;
+            filteredPandals.forEach(
+                function(pandal) {
 
 
-                grid.appendChild(card);
+                    const card =
+                        document.createElement(
+                            "article"
+                        );
 
-            });
+
+                    card.className =
+                        "pandal-card";
+
+
+                    card.innerHTML = `
+
+                        <div class="pandal-card-content">
+
+                            <span class="pandal-category">
+                                ${pandal.category || "Pandal"}
+                            </span>
+
+
+                            <h2>
+                                ${pandal.name || "Unnamed Pandal"}
+                            </h2>
+
+
+                            <p class="pandal-area">
+                                📍 ${pandal.area || "Kolkata"}
+                            </p>
+
+
+                            <p>
+                                ${
+                                    pandal.description ||
+                                    "Durga Puja pandal information."
+                                }
+                            </p>
+
+                        </div>
+
+                    `;
+
+
+                    grid.appendChild(card);
+
+                }
+            );
 
         }
 
 
-        // Search
+
+        /* -----------------------------------------
+           SEARCH EVENT
+        ------------------------------------------ */
+
         document
             .getElementById("pandalSearch")
             .addEventListener(
                 "input",
-                displayPandals
+                function() {
+
+                    displayPandals();
+
+                }
             );
 
 
-        // Zone Filters
+
+        /* -----------------------------------------
+           FILTER EVENTS
+        ------------------------------------------ */
+
         document
             .querySelectorAll(".filter-btn")
-            .forEach(function(button) {
-
-                button.addEventListener(
-                    "click",
-                    function() {
-
-                        document
-                            .querySelectorAll(".filter-btn")
-                            .forEach(function(btn) {
-                                btn.classList.remove("active");
-                            });
+            .forEach(
+                function(button) {
 
 
-                        this.classList.add("active");
+                    button.addEventListener(
+                        "click",
+                        function() {
 
 
-                        selectedZone =
-                            this.dataset.zone;
+                            /* Remove active
+                               from all buttons */
+
+                            document
+                                .querySelectorAll(
+                                    ".filter-btn"
+                                )
+                                .forEach(
+                                    function(btn) {
+
+                                        btn.classList
+                                            .remove(
+                                                "active"
+                                            );
+
+                                    }
+                                );
 
 
-                        displayPandals();
+                            /* Activate
+                               selected button */
 
-                    }
-                );
+                            this.classList.add(
+                                "active"
+                            );
 
-            });
+
+                            /* Store zone */
+
+                            selectedZone =
+                                this.dataset.zone;
 
 
-        // Start
+                            /* Refresh cards */
+
+                            displayPandals();
+
+                        }
+                    );
+
+                }
+            );
+
+
+
+        /* -----------------------------------------
+           START APPLICATION
+        ------------------------------------------ */
+
         loadPandals();
 
     </script>
 
 </body>
+
 </html>
